@@ -1,8 +1,8 @@
 {
-  "project": "oil_record_book_tool",
+  "project": "engine_room_status_board",
   "project_path": "/Users/dp/Projects/oil_record_book_tool",
   "phase": 6,
-  "iteration": 1,
+  "iteration": 3,
   "status": "iteration_complete",
   "tech_stack": "python-flask-sqlite",
   "agents": [],
@@ -23,10 +23,22 @@
       "started_at": "2025-12-12T12:00:00",
       "completed_at": "2025-12-12T14:00:00",
       "notes": "Added daily fuel ticket tracking: service tank selector, meter readings, consumption calculation, auto-fill previous end reading. 22 tests total."
+    },
+    {
+      "phase": "iteration",
+      "started_at": "2025-12-18T00:00:00",
+      "completed_at": "2025-12-18T12:00:00",
+      "notes": "Expanded to Engine Room Status Board: renamed app, added StatusEvent/EquipmentStatus/OilLevel models, sewage/potable cards, equipment status grid (10 items), dashboard redesign with modals"
+    },
+    {
+      "phase": "iteration",
+      "started_at": "2025-12-19T00:00:00",
+      "completed_at": "2025-12-19T06:00:00",
+      "notes": "Added Start New Hitch feature: HitchRecord model, data reset/clear, baseline import from previous crew, initializes slop tanks/oil levels/equipment status"
     }
   ],
   "created_at": "2025-12-12T00:00:00",
-  "last_updated": "2025-12-12T14:00:00",
+  "last_updated": "2025-12-19T06:00:00",
   "mvp_features": {
     "weekly_soundings": "complete",
     "orb_code_c": "complete",
@@ -35,8 +47,28 @@
     "history_view": "complete",
     "daily_fuel_tickets": "complete",
     "service_tank_selector": "complete",
-    "end_of_hitch_import": "not_started",
+    "sewage_potable_tracking": "complete",
+    "equipment_status": "complete",
+    "start_new_hitch": "complete",
     "handover_package": "not_started"
   },
-  "test_count": 22
+  "models": [
+    "WeeklySounding",
+    "ORBEntry",
+    "ServiceTankConfig",
+    "DailyFuelTicket",
+    "StatusEvent",
+    "EquipmentStatus",
+    "OilLevel",
+    "HitchRecord"
+  ],
+  "api_endpoints": {
+    "tanks": ["GET /api/tanks", "GET /api/tanks/<id>/lookup"],
+    "soundings": ["GET /api/soundings", "POST /api/soundings", "GET /api/dashboard/stats"],
+    "fuel": ["GET /api/fuel-tickets", "POST /api/fuel-tickets", "GET /api/fuel-tickets/stats", "GET /api/service-tank", "POST /api/service-tank"],
+    "status": ["GET /api/status-events", "POST /api/status-events", "GET /api/status-events/latest"],
+    "equipment": ["GET /api/equipment", "GET /api/equipment/<id>", "POST /api/equipment/<id>", "POST /api/equipment/bulk"],
+    "hitch": ["GET /api/hitch/current", "POST /api/hitch/start", "POST /api/hitch/reset"],
+    "dashboard": ["GET /api/dashboard/full"]
+  }
 }
