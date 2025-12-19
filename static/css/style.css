@@ -1518,4 +1518,75 @@ body {
   min-width: 140px;
 }
 
+/* ==========================================
+   New Hitch Page
+   ========================================== */
+
+.new-hitch-page {
+  max-width: 100%;
+}
+
+.warning-card {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--accent-danger);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.warning-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warning-text strong {
+  color: var(--accent-danger);
+  font-size: 1rem;
+}
+
+.warning-text p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: var(--space-xs);
+}
+
+.oil-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+}
+
+.oil-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.oil-input label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.oil-input .form-input {
+  padding: var(--space-sm);
+}
+
+.btn-danger {
+  background: var(--accent-danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.btn-danger:active {
+  transform: translateY(0);
+}
+
 

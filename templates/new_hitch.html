@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% block title %}Start New Hitch - Engine Room{% endblock %}
+
+{% block content %}
+<div class="new-hitch-page">
+    <header class="page-header">
+        <h1>Start New Hitch</h1>
+        <p class="page-subtitle">Import baseline from previous crew</p>
+    </header>
+
+    <div class="warning-card">
+        <div class="warning-icon">⚠️</div>
+        <div class="warning-text">
+            <strong>This will clear all existing data</strong>
+            <p>All fuel tickets, soundings, and ORB entries will be deleted. Make sure you've generated handover documents if needed.</p>
+        </div>
+    </div>
+
+    <form id="hitch-form" class="form">
+        <!-- Date -->
+        <div class="form-section">
+            <label class="form-label">Hitch Start Date</label>
+            <input type="date" id="start-date" class="form-input" required>
+        </div>
+
+        <!-- Location -->
+        <div class="form-section">
+            <label class="form-label">Location</label>
+            <input type="text" id="location" class="form-input" placeholder="Port Angeles, WA">
+        </div>
+
+        <!-- Total Fuel -->
+        <div class="form-section">
+            <label class="form-label">Total Fuel Onboard (gallons)</label>
+            <input type="number" id="total-fuel" class="form-input" step="1" required placeholder="105055">
+        </div>
+
+        <!-- Service Oils -->
+        <div class="form-section">
+            <div class="section-header">
+                <span class="section-icon">🛢️</span>
+                <span class="section-title">Service Oils (gallons)</span>
+            </div>
+            <div class="oil-grid">
+                <div class="oil-input">
+                    <label>15P Lube</label>
+                    <input type="number" id="lube-15p" class="form-input" step="1" placeholder="300">
+                </div>
+                <div class="oil-input">
+                    <label>15S Gear</label>
+                    <input type="number" id="gear-15s" class="form-input" step="1" placeholder="279">
+                </div>
+                <div class="oil-input">
+                    <label>16P Lube</label>
+                    <input type="number" id="lube-16p" class="form-input" step="1" placeholder="304">
+                </div>
+                <div class="oil-input">
+                    <label>16S Hyd</label>
+                    <input type="number" id="hyd-16s" class="form-input" step="1" placeholder="305">
+                </div>
+            </div>
+        </div>
+
+        <!-- Slop Tanks -->
+        <div class="form-section tank-section">
+            <div class="section-header">
+                <span class="tank-badge">17P</span>
+                <span class="tank-label">Oily Bilge</span>
+            </div>
+            <div class="sounding-input">
+                <div class="input-group">
+                    <select id="oily-bilge-feet" class="form-select">
+                        <option value="">Ft</option>
+                        <option value="0">0'</option>
+                        <option value="1">1'</option>
+                        <option value="2">2'</option>
+                        <option value="3">3'</option>
+                    </select>
+                    <select id="oily-bilge-inches" class="form-select">
+                        <option value="">In</option>
+                        <option value="0">0"</option>
+                        <option value="1">1"</option>
+                        <option value="2">2"</option>
+                        <option value="3">3"</option>
+                        <option value="4">4"</option>
+                        <option value="5">5"</option>
+                        <option value="6">6"</option>
+                        <option value="7">7"</option>
+                        <option value="8">8"</option>
+                        <option value="9">9"</option>
+                        <option value="10">10"</option>
+                        <option value="11">11"</option>
+                    </select>
+                    <input type="number" id="oily-bilge-gallons" class="form-input" placeholder="137 gal" step="1">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section tank-section">
+            <div class="section-header">
+                <span class="tank-badge">17S</span>
+                <span class="tank-label">Dirty Oil</span>
+            </div>
+            <div class="sounding-input">
+                <div class="input-group">
+                    <select id="dirty-oil-feet" class="form-select">
+                        <option value="">Ft</option>
+                        <option value="0">0'</option>
+                        <option value="1">1'</option>
+                        <option value="2">2'</option>
+                        <option value="3">3'</option>
+                    </select>
+                    <select id="dirty-oil-inches" class="form-select">
+                        <option value="">In</option>
+                        <option value="0">0"</option>
+                        <option value="1">1"</option>
+                        <option value="2">2"</option>
+                        <option value="3">3"</option>
+                        <option value="4">4"</option>
+                        <option value="5">5"</option>
+                        <option value="6">6"</option>
+                        <option value="7">7"</option>
+                        <option value="8">8"</option>
+                        <option value="9">9"</option>
+                        <option value="10">10"</option>
+                        <option value="11">11"</option>
+                    </select>
+                    <input type="number" id="dirty-oil-gallons" class="form-input" placeholder="462 gal" step="1">
+                </div>
+            </div>
+        </div>
+
+        <!-- Previous Engineer -->
+        <div class="form-section">
+            <label class="form-label">Previous Engineer (who did soundings)</label>
+            <input type="text" id="previous-engineer" class="form-input" placeholder="Aaron Frahm">
+        </div>
+
+        <button type="submit" class="btn btn-danger btn-lg btn-block" id="submit-btn">
+            Clear Data & Start New Hitch
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Set default date to today
+    document.getElementById('start-date').value = new Date().toISOString().split('T')[0];
+
+    // Form submission
+    document.getElementById('hitch-form').addEventListener('submit', handleSubmit);
+});
+
+async function handleSubmit(e) {
+    e.preventDefault();
+
+    // Confirm action
+    if (!confirm('This will DELETE all existing data and start fresh. Are you sure?')) {
+        return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Starting...';
+
+    const data = {
+        start_date: document.getElementById('start-date').value + 'T00:00:00',
+        location: document.getElementById('location').value || null,
+        total_fuel_gallons: parseFloat(document.getElementById('total-fuel').value),
+        lube_oil_15p: parseFloat(document.getElementById('lube-15p').value) || null,
+        gear_oil_15s: parseFloat(document.getElementById('gear-15s').value) || null,
+        lube_oil_16p: parseFloat(document.getElementById('lube-16p').value) || null,
+        hyd_oil_16s: parseFloat(document.getElementById('hyd-16s').value) || null,
+        oily_bilge_17p: {
+            feet: parseInt(document.getElementById('oily-bilge-feet').value) || 0,
+            inches: parseInt(document.getElementById('oily-bilge-inches').value) || 0,
+            gallons: parseFloat(document.getElementById('oily-bilge-gallons').value) || 0,
+        },
+        dirty_oil_17s: {
+            feet: parseInt(document.getElementById('dirty-oil-feet').value) || 0,
+            inches: parseInt(document.getElementById('dirty-oil-inches').value) || 0,
+            gallons: parseFloat(document.getElementById('dirty-oil-gallons').value) || 0,
+        },
+        previous_engineer: document.getElementById('previous-engineer').value || null,
+        clear_data: true,
+    };
+
+    try {
+        const response = await fetch('/api/hitch/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            alert('New hitch started successfully!');
+            window.location.href = '/';
+        } else {
+            const error = await response.json();
+            alert('Error: ' + error.error);
+        }
+    } catch (e) {
+        console.error('Failed:', e);
+        alert('Network error. Please try again.');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Clear Data & Start New Hitch';
+    }
+}
+</script>
+{% endblock %}
+

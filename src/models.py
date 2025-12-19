@@ -284,3 +284,75 @@ class OilLevel(db.Model):
             "created_at": self.created_at.isoformat(),
         }
 
+
+class HitchRecord(db.Model):
+    """Record of a hitch (21-day rotation) for baseline tracking."""
+
+    __tablename__ = "hitch_records"
+
+    id: int = db.Column(db.Integer, primary_key=True)
+    start_date: datetime = db.Column(db.DateTime, nullable=False)
+    end_date: datetime = db.Column(db.DateTime, nullable=True)
+
+    # Header info from End of Hitch form
+    location: str = db.Column(db.String(100), nullable=True)
+    draft_forward: str = db.Column(db.String(20), nullable=True)
+    draft_aft: str = db.Column(db.String(20), nullable=True)
+    fuel_on_log: float = db.Column(db.Float, nullable=True)
+    correction: float = db.Column(db.Float, nullable=True)
+
+    # Total fuel baseline
+    total_fuel_gallons: float = db.Column(db.Float, nullable=False)
+
+    # Service oil baselines
+    lube_oil_15p: float = db.Column(db.Float, nullable=True)
+    gear_oil_15s: float = db.Column(db.Float, nullable=True)
+    lube_oil_16p: float = db.Column(db.Float, nullable=True)
+    hyd_oil_16s: float = db.Column(db.Float, nullable=True)
+
+    # Slop tank baselines
+    oily_bilge_17p_gallons: float = db.Column(db.Float, nullable=True)
+    oily_bilge_17p_feet: int = db.Column(db.Integer, nullable=True)
+    oily_bilge_17p_inches: int = db.Column(db.Integer, nullable=True)
+    dirty_oil_17s_gallons: float = db.Column(db.Float, nullable=True)
+    dirty_oil_17s_feet: int = db.Column(db.Integer, nullable=True)
+    dirty_oil_17s_inches: int = db.Column(db.Integer, nullable=True)
+
+    # Who performed the previous crew's soundings
+    previous_engineer: str = db.Column(db.String(100), nullable=True)
+
+    # Metadata
+    created_at: datetime = db.Column(
+        db.DateTime, nullable=False, default=datetime.utcnow
+    )
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary for JSON serialization."""
+        return {
+            "id": self.id,
+            "start_date": self.start_date.isoformat(),
+            "end_date": self.end_date.isoformat() if self.end_date else None,
+            "location": self.location,
+            "draft_forward": self.draft_forward,
+            "draft_aft": self.draft_aft,
+            "fuel_on_log": self.fuel_on_log,
+            "correction": self.correction,
+            "total_fuel_gallons": self.total_fuel_gallons,
+            "lube_oil_15p": self.lube_oil_15p,
+            "gear_oil_15s": self.gear_oil_15s,
+            "lube_oil_16p": self.lube_oil_16p,
+            "hyd_oil_16s": self.hyd_oil_16s,
+            "oily_bilge_17p": {
+                "gallons": self.oily_bilge_17p_gallons,
+                "feet": self.oily_bilge_17p_feet,
+                "inches": self.oily_bilge_17p_inches,
+            },
+            "dirty_oil_17s": {
+                "gallons": self.dirty_oil_17s_gallons,
+                "feet": self.dirty_oil_17s_feet,
+                "inches": self.dirty_oil_17s_inches,
+            },
+            "previous_engineer": self.previous_engineer,
+            "created_at": self.created_at.isoformat(),
+        }
+

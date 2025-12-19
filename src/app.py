@@ -52,6 +52,11 @@ def create_app(config_name: str | None = None) -> Flask:
         """Daily fuel ticket entry and tracking."""
         return render_template("fuel.html")
 
+    @app.route("/new-hitch")
+    def new_hitch():
+        """Start new hitch / import baseline."""
+        return render_template("new_hitch.html")
+
     return app
 
 
