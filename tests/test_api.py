@@ -24,6 +24,7 @@ def app():
     # Create a minimal app without security features
     from flask import Flask
     from config import TestingConfig
+    from flask_login import LoginManager
 
     app = Flask(__name__)
     app.config.from_object(TestingConfig)
@@ -33,6 +34,56 @@ def app():
 
     # Initialize database
     db.init_app(app)
+
+    # Initialize minimal login manager for tests
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = None  # Disable redirects
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        """Mock user loader for tests."""
+        from models import User
+        # Return a mock user for tests
+        class MockUser:
+            id = 1
+            username = "test_user"
+            role = "chief_engineer"
+            is_active = True
+            is_authenticated = True
+            is_anonymous = False
+
+            def get_id(self):
+                return str(self.id)
+
+            def can_access_route(self, route_type):
+                """Allow all access in tests."""
+                return True
+
+        return MockUser()
+
+    # Mock the current_user for all requests
+    @app.before_request
+    def mock_login():
+        from flask_login import login_user
+        from flask import g
+        # Create a mock user and log them in
+        class MockUser:
+            id = 1
+            username = "test_user"
+            role = "chief_engineer"
+            is_active = True
+            is_authenticated = True
+            is_anonymous = False
+
+            def get_id(self):
+                return str(self.id)
+
+            def can_access_route(self, route_type):
+                """Allow all access in tests."""
+                return True
+
+        g._login_user = MockUser()
 
     # Register API blueprint only
     from routes.api import api_bp
