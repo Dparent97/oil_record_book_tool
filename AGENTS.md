@@ -69,17 +69,21 @@ Analyzed Flask-based maritime fuel tracking app. Codebase is functional with goo
 
 ### fix-datetime-deprecations
 - **Agent**: implementer
-- **Status**: working
+- **Status**: done
 - **Priority**: medium
 - **Launched**: 2025-12-27 18:52:00
 - **Branch**: agent/fix-datetime-deprecations
+- **Completed**: 2025-12-28 03:10:00
+- **Summary**: Successfully replaced all deprecated `datetime.utcnow()` calls with timezone-aware `datetime.now(UTC)`. Fixed 8 instances in models.py defaults, 1 in fuel_service.py, 4 in api.py routes, and 2 in tests. All tests pass with zero deprecation warnings.
+- **Files Changed**: src/models.py, src/services/fuel_service.py, src/routes/api.py, tests/test_fuel_service.py
+- **Tests**: pass (29 tests, zero datetime-related warnings)
 - **Description**: Replace deprecated `datetime.utcnow()` calls with timezone-aware `datetime.now(UTC)`. Currently 4 warnings in fuel_service.py and tests. Affects production reliability (will break in future Python versions).
 - **Acceptance Criteria**:
-  - [ ] Replace all `datetime.utcnow()` with `datetime.now(UTC)`
-  - [ ] Update imports to use `from datetime import UTC`
-  - [ ] Verify all datetime comparisons still work correctly
-  - [ ] Update test fixtures to use timezone-aware datetimes
-  - [ ] Zero pytest warnings related to datetime
+  - [x] Replace all `datetime.utcnow()` with `datetime.now(UTC)`
+  - [x] Update imports to use `from datetime import UTC`
+  - [x] Verify all datetime comparisons still work correctly
+  - [x] Update test fixtures to use timezone-aware datetimes
+  - [x] Zero pytest warnings related to datetime
 - **Dependencies**: none
 - **Estimated Effort**: small
 
