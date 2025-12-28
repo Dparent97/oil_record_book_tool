@@ -3,12 +3,14 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask, render_template
+from flask_login import LoginManager, login_required, current_user
 
 # Load environment variables from .env file
 load_dotenv()
 
 from config import config
-from models import db
+from models import db, User
+from flask_migrate import Migrate
 
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -25,10 +27,21 @@ def create_app(config_name: str | None = None) -> Flask:
 
     # Initialize extensions
     db.init_app(app)
+    migrate = Migrate(app, db)
 
-    # Create tables
-    with app.app_context():
-        db.create_all()
+    # Configure Flask-Login
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = "auth.login"
+    login_manager.login_message = "Please log in to access this page."
+    login_manager.login_message_category = "info"
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        """Load user by ID for Flask-Login."""
+        return User.query.get(int(user_id))
+
+    # Note: db.create_all() removed - use migrations instead
 
     # Register blueprints
     from routes.api import api_bp

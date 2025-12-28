@@ -1,6 +1,6 @@
 """API routes for Oil Record Book Tool."""
 
-from datetime import datetime
+from datetime import datetime, UTC
 from flask import Blueprint, current_app, jsonify, request
 
 from models import (
@@ -276,7 +276,7 @@ def set_active_service_tank():
         return jsonify({"error": f"Invalid tank pair: {tank_pair}"}), 400
 
     try:
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         # Deactivate current active tank
         current = ServiceTankConfig.query.filter_by(deactivated_at=None).first()
@@ -568,7 +568,7 @@ def update_equipment_status(equipment_id: str):
             equipment_id=equipment_id,
             status=data["status"],
             note=data.get("note"),
-            updated_at=datetime.utcnow(),
+            updated_at=datetime.now(UTC),
             updated_by=data["updated_by"],
         )
         db.session.add(status)
@@ -600,7 +600,7 @@ def update_equipment_bulk():
         return jsonify({"error": "updates and updated_by required"}), 400
 
     try:
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         results = []
 
         for update in data["updates"]:
@@ -855,7 +855,7 @@ def start_new_hitch():
             # End any active hitch
             active_hitch = HitchRecord.query.filter_by(end_date=None, is_start=True).first()
             if active_hitch:
-                active_hitch.end_date = datetime.utcnow()
+                active_hitch.end_date = datetime.now(UTC)
 
             # Clear operational tables
             FuelTankSounding.query.delete()

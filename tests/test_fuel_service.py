@@ -1,7 +1,7 @@
 """Tests for fuel service."""
 
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from unittest.mock import MagicMock
 
 import sys
@@ -102,7 +102,7 @@ class TestFuelService:
 
     def test_get_weekly_summary_with_recent(self):
         """Test weekly summary with recent tickets."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         
         tickets = []
         for i in range(5):
@@ -119,7 +119,7 @@ class TestFuelService:
 
     def test_get_weekly_summary_excludes_old(self):
         """Test weekly summary excludes tickets older than 7 days."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         
         # Recent ticket
         recent = MagicMock()

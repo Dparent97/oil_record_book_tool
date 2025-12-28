@@ -23,7 +23,7 @@ Analyzed Flask-based maritime fuel tracking app. Codebase is functional with goo
 
 ### add-api-route-tests
 - **Agent**: implementer
-- **Status**: ready
+- **Status**: working
 - **Priority**: high
 - **Description**: Add comprehensive test coverage for all API routes in `src/routes/api.py`. Currently 0% coverage on routes (1116 lines untested). Test all endpoints: soundings, ORB entries, fuel tickets, equipment status, hitch management, OCR parsing.
 - **Acceptance Criteria**:
@@ -38,7 +38,7 @@ Analyzed Flask-based maritime fuel tracking app. Codebase is functional with goo
 
 ### add-service-and-model-tests
 - **Agent**: implementer
-- **Status**: ready
+- **Status**: working
 - **Priority**: high
 - **Description**: Add tests for untested services and models. Currently missing: ORBService, OCR service, all database models (WeeklySounding, ORBEntry, HitchRecord, etc.). Mock Google Vision API calls for OCR tests.
 - **Acceptance Criteria**:
@@ -69,8 +69,10 @@ Analyzed Flask-based maritime fuel tracking app. Codebase is functional with goo
 
 ### fix-datetime-deprecations
 - **Agent**: implementer
-- **Status**: ready
+- **Status**: working
 - **Priority**: medium
+- **Launched**: 2025-12-27 18:52:00
+- **Branch**: agent/fix-datetime-deprecations
 - **Description**: Replace deprecated `datetime.utcnow()` calls with timezone-aware `datetime.now(UTC)`. Currently 4 warnings in fuel_service.py and tests. Affects production reliability (will break in future Python versions).
 - **Acceptance Criteria**:
   - [ ] Replace all `datetime.utcnow()` with `datetime.now(UTC)`
@@ -118,7 +120,7 @@ Analyzed Flask-based maritime fuel tracking app. Codebase is functional with goo
 
 ### create-database-migrations
 - **Agent**: implementer
-- **Status**: ready
+- **Status**: working
 - **Priority**: medium
 - **Description**: Set up database migration system using Flask-Migrate (Alembic). Currently uses `db.create_all()` which is unsuitable for production. Enable schema evolution without data loss.
 - **Acceptance Criteria**:

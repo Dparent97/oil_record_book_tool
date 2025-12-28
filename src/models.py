@@ -1,9 +1,91 @@
 """Database models for Oil Record Book Tool."""
 
-from datetime import datetime
+from datetime import datetime, UTC
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+import bcrypt
+from enum import Enum
 
 db = SQLAlchemy()
+
+
+class UserRole(Enum):
+    """User roles for access control."""
+    CHIEF_ENGINEER = "chief_engineer"
+    ENGINEER = "engineer"
+    VIEWER = "viewer"
+
+
+class User(UserMixin, db.Model):
+    """User authentication and authorization."""
+
+    __tablename__ = "users"
+
+    id: int = db.Column(db.Integer, primary_key=True)
+    username: str = db.Column(db.String(80), unique=True, nullable=False, index=True)
+    email: str = db.Column(db.String(120), unique=True, nullable=True)
+    password_hash: str = db.Column(db.String(256), nullable=False)
+    role: str = db.Column(db.Enum(UserRole), nullable=False, default=UserRole.ENGINEER)
+    full_name: str = db.Column(db.String(120), nullable=True)
+    is_active: bool = db.Column(db.Boolean, default=True, nullable=False)
+
+    # Session persistence
+    last_login: datetime = db.Column(db.DateTime, nullable=True)
+
+    # Metadata
+    created_at: datetime = db.Column(
+        db.DateTime, nullable=False, default=lambda: datetime.now(UTC)
+    )
+    updated_at: datetime = db.Column(
+        db.DateTime, nullable=False, default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC)
+    )
+
+    def set_password(self, password: str) -> None:
+        """Hash and set password using bcrypt."""
+        salt = bcrypt.gensalt()
+        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+
+    def check_password(self, password: str) -> bool:
+        """Check password against stored hash."""
+        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
+
+    def has_role(self, role: UserRole) -> bool:
+        """Check if user has specific role."""
+        return self.role == role
+
+    def can_access_route(self, route_type: str) -> bool:
+        """Check if user can access a specific route type."""
+        if not self.is_active:
+            return False
+
+        # Everyone can read
+        if route_type == "read":
+            return True
+
+        # Only Chief Engineer and Engineer can write
+        if route_type == "write":
+            return self.role in [UserRole.CHIEF_ENGINEER, UserRole.ENGINEER]
+
+        # Only Chief Engineer can do admin operations (start hitch, manage users)
+        if route_type == "admin":
+            return self.role == UserRole.CHIEF_ENGINEER
+
+        return False
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary for JSON serialization."""
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "role": self.role.value,
+            "full_name": self.full_name,
+            "is_active": self.is_active,
+            "last_login": self.last_login.isoformat() if self.last_login else None,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+        }
 
 
 class WeeklySounding(db.Model):
@@ -30,7 +112,7 @@ class WeeklySounding(db.Model):
 
     # Metadata
     created_at: datetime = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow
+        db.DateTime, nullable=False, default=lambda: datetime.now(UTC)
     )
 
     def to_dict(self) -> dict:
@@ -74,7 +156,7 @@ class ORBEntry(db.Model):
 
     # Metadata
     created_at: datetime = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow
+        db.DateTime, nullable=False, default=lambda: datetime.now(UTC)
     )
 
     def to_dict(self) -> dict:
@@ -102,7 +184,7 @@ class ServiceTankConfig(db.Model):
 
     # Metadata
     created_at: datetime = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow
+        db.DateTime, nullable=False, default=lambda: datetime.now(UTC)
     )
 
     @property
@@ -150,7 +232,7 @@ class DailyFuelTicket(db.Model):
 
     # Metadata
     created_at: datetime = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow
+        db.DateTime, nullable=False, default=lambda: datetime.now(UTC)
     )
 
     def to_dict(self) -> dict:
@@ -197,7 +279,7 @@ class StatusEvent(db.Model):
 
     # Metadata
     created_at: datetime = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow
+        db.DateTime, nullable=False, default=lambda: datetime.now(UTC)
     )
 
     def to_dict(self) -> dict:
@@ -226,7 +308,7 @@ class EquipmentStatus(db.Model):
 
     # Metadata
     created_at: datetime = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow
+        db.DateTime, nullable=False, default=lambda: datetime.now(UTC)
     )
 
     def to_dict(self) -> dict:
@@ -267,7 +349,7 @@ class OilLevel(db.Model):
 
     # Metadata
     created_at: datetime = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow
+        db.DateTime, nullable=False, default=lambda: datetime.now(UTC)
     )
 
     def to_dict(self) -> dict:
@@ -370,7 +452,7 @@ class HitchRecord(db.Model):
 
     # Metadata
     created_at: datetime = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow
+        db.DateTime, nullable=False, default=lambda: datetime.now(UTC)
     )
 
     # Relationships
