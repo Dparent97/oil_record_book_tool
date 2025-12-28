@@ -56,9 +56,9 @@ class TestInputValidation:
         response = client.get("/api/v1/tanks/17P/lookup")
         assert response.status_code == 400
         data = response.get_json()
-        assert "Validation failed" in data["error"]
+        assert "required" in data["error"]
 
-        # Test invalid parameters
+        # Test invalid parameters (None for non-int)
         response = client.get("/api/v1/tanks/17P/lookup?feet=abc&inches=xyz")
         assert response.status_code == 400
 

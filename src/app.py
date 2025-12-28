@@ -37,7 +37,7 @@ def create_app(config_name: str | None = None) -> Flask:
     # Initialize security extensions
     csrf = CSRFProtect(app)
     limiter = Limiter(
-        app,
+        app=app,
         key_func=get_remote_address,
         default_limits=[SecurityConfig.RATE_LIMIT_PER_HOUR],
         storage_uri=app.config.get("RATELIMIT_STORAGE_URL", "memory://")
@@ -82,10 +82,12 @@ def create_app(config_name: str | None = None) -> Flask:
             return jsonify({"error": "Request entity too large"}), 413
 
     # CSRF error handler
-    @csrf.error_handler
-    def csrf_error(reason):
+    @app.errorhandler(400)
+    def csrf_error(error):
         """Handle CSRF errors."""
-        return jsonify({"error": f"CSRF token error: {reason}"}), 400
+        if error.description and "csrf" in error.description.lower():
+            return jsonify({"error": f"CSRF token error: {error.description}"}), 400
+        return jsonify({"error": "Bad request"}), 400
 
     # Rate limit error handler
     @app.errorhandler(429)

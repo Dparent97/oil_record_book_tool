@@ -120,7 +120,7 @@ def sample_equipment_status():
     return EquipmentStatus(
         equipment_id="PME",
         status="online",
-        updated_at=datetime(2025, 12, 15, 10, 0, 0),
+        updated_at=datetime(2025, 12, 15, 10, 0, 0, tzinfo=UTC),
         updated_by="Test Engineer"
     )
 
@@ -130,7 +130,7 @@ def sample_hitch():
     """Create sample hitch record."""
     return HitchRecord(
         vessel="USNS Test Vessel",
-        date=datetime(2025, 12, 1, 0, 0, 0),
+        date=datetime(2025, 12, 1, 0, 0, 0, tzinfo=UTC),
         location="Norfolk",
         charter="MSC",
         draft_forward_feet=12,

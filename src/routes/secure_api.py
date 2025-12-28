@@ -104,12 +104,20 @@ def get_tanks():
 
 @secure_api_bp.route("/tanks/<tank_id>/lookup", methods=["GET"])
 @limiter.limit(SecurityConfig.RATE_LIMIT_PER_MINUTE)
-@validate_form(TankLookupForm)
 def lookup_sounding(tank_id: str):
     """Look up volume for a sounding."""
-    data = request.validated_data
-    feet = data["feet"]
-    inches = data["inches"]
+    # For GET requests, validate query parameters directly
+    feet = request.args.get("feet", type=int)
+    inches = request.args.get("inches", type=int)
+
+    if feet is None or inches is None:
+        return jsonify({"error": "feet and inches required"}), 400
+
+    # Validate parameter ranges
+    if feet < 0 or feet > 50:
+        return jsonify({"error": "feet must be between 0 and 50"}), 400
+    if inches < 0 or inches > 11:
+        return jsonify({"error": "inches must be between 0 and 11"}), 400
 
     try:
         service = get_sounding_service()

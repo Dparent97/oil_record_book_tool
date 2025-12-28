@@ -110,6 +110,7 @@ def get_latest_sounding():
 
 
 @api_bp.route("/soundings", methods=["POST"])
+@require_role("write")
 def create_sounding():
     """
     Create a new weekly sounding and generate ORB entries.
@@ -275,6 +276,7 @@ def get_active_service_tank():
 
 
 @api_bp.route("/service-tanks/active", methods=["POST"])
+@require_role("write")
 def set_active_service_tank():
     """
     Set the active service tank pair.
@@ -341,6 +343,7 @@ def get_latest_fuel_ticket():
 
 
 @api_bp.route("/fuel-tickets", methods=["POST"])
+@require_role("write")
 def create_fuel_ticket():
     """
     Create a new daily fuel ticket.
@@ -458,6 +461,7 @@ def get_latest_status_events():
 
 
 @api_bp.route("/status-events", methods=["POST"])
+@require_role("write")
 def create_status_event():
     """
     Create a new status event.
@@ -549,6 +553,7 @@ def get_equipment_status(equipment_id: str):
 
 
 @api_bp.route("/equipment/<equipment_id>", methods=["POST"])
+@require_role("write")
 def update_equipment_status(equipment_id: str):
     """
     Update equipment status.
@@ -600,6 +605,7 @@ def update_equipment_status(equipment_id: str):
 
 
 @api_bp.route("/equipment/bulk", methods=["POST"])
+@require_role("write")
 def update_equipment_bulk():
     """
     Bulk update equipment statuses.
@@ -725,6 +731,7 @@ def get_full_dashboard():
 
 
 @api_bp.route("/hitch/parse-image", methods=["POST"])
+@require_role("admin")
 def parse_hitch_image():
     """
     Parse an uploaded End of Hitch Sounding Form image.
@@ -771,6 +778,7 @@ def get_hitch(hitch_id: int):
 
 
 @api_bp.route("/hitch/<int:hitch_id>", methods=["PUT"])
+@require_role("admin")
 def update_hitch(hitch_id: int):
     """Update an existing hitch record (for end-of-hitch editing)."""
     hitch = HitchRecord.query.get_or_404(hitch_id)
@@ -839,6 +847,7 @@ def update_hitch(hitch_id: int):
 
 
 @api_bp.route("/hitch/start", methods=["POST"])
+@require_role("admin")
 def start_new_hitch():
     """
     Start a new hitch with complete End of Hitch Sounding Form data.
@@ -1007,6 +1016,7 @@ def start_new_hitch():
 
 
 @api_bp.route("/hitch/end", methods=["POST"])
+@require_role("admin")
 def create_end_of_hitch():
     """
     Create end-of-hitch record (for printing/handover).
@@ -1098,6 +1108,7 @@ def create_end_of_hitch():
 
 
 @api_bp.route("/hitch/reset", methods=["POST"])
+@require_role("admin")
 def reset_all_data():
     """
     Emergency reset - clears ALL data without creating new hitch.
