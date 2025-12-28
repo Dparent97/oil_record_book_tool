@@ -54,6 +54,7 @@ def require_role(route_type: str):
 
 
 @api_bp.route("/tanks", methods=["GET"])
+@require_role("read")
 def get_tanks():
     """Get available tanks and their metadata."""
     service = get_sounding_service()
@@ -222,6 +223,7 @@ def get_orb_entry(entry_id: int):
 
 
 @api_bp.route("/dashboard/stats", methods=["GET"])
+@require_role("read")
 def get_dashboard_stats():
     """Get summary stats for dashboard."""
     latest = WeeklySounding.query.order_by(
@@ -664,6 +666,7 @@ def update_equipment_bulk():
 
 
 @api_bp.route("/dashboard/full", methods=["GET"])
+@require_role("read")
 def get_full_dashboard():
     """Get all dashboard data in one call."""
     # Slop tank soundings

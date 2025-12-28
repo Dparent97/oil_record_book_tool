@@ -38,15 +38,24 @@ Analyzed Flask-based maritime fuel tracking app. Codebase is functional with goo
 
 ### add-service-and-model-tests
 - **Agent**: implementer
-- **Status**: working
+- **Status**: done
 - **Priority**: high
+- **Launched**: 2025-12-27 19:00:00
+- **Branch**: agent/add-service-and-model-tests
+- **Completed**: 2025-12-27 19:15:00
+- **Summary**: Created comprehensive test suite with 53 new tests covering ORBService, OCR service, and all database models. All tests passing.
+- **Files Created**:
+  - `/Users/dp/Projects/oil_record_book_tool/tests/test_orb_service.py` - 7 tests for ORB entry generation
+  - `/Users/dp/Projects/oil_record_book_tool/tests/test_ocr_service.py` - 19 tests for OCR parsing with mocked Vision API
+  - `/Users/dp/Projects/oil_record_book_tool/tests/test_models.py` - 27 tests for all database models, relationships, and constraints
+- **Tests**: pass (53 new tests, 0 failures)
 - **Description**: Add tests for untested services and models. Currently missing: ORBService, OCR service, all database models (WeeklySounding, ORBEntry, HitchRecord, etc.). Mock Google Vision API calls for OCR tests.
 - **Acceptance Criteria**:
-  - [ ] ORBService: test Code C/I entry generation formatting
-  - [ ] OCR service: test form parsing with mock Vision API responses
-  - [ ] Model tests: test to_dict(), relationships, validations
-  - [ ] Test database constraints and cascades
-  - [ ] Achieve >80% coverage on untested files
+  - [x] ORBService: test Code C/I entry generation formatting
+  - [x] OCR service: test form parsing with mock Vision API responses
+  - [x] Model tests: test to_dict(), relationships, validations
+  - [x] Test database constraints and cascades
+  - [x] Achieve >80% coverage on untested files
 - **Dependencies**: none
 - **Estimated Effort**: large
 
