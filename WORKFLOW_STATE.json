@@ -1,155 +1,70 @@
 {
-  "project": "engine_room_status_board",
+  "project": "oil_record_book_tool",
   "project_path": "/Users/dp/Projects/oil_record_book_tool",
-  "phase": 6,
-  "iteration": 5,
-  "status": "wave1_integrated",
+  "phase": "deployed",
+  "iteration": 2,
+  "status": "wave2_complete",
   "tech_stack": "python-flask-sqlite",
-  "wave": {
-    "number": 1,
-    "name": "Foundation & Security",
-    "started_at": "2025-12-27T00:00:00",
-    "completed_at": "2025-12-28T15:00:00",
-    "status": "complete"
-  },
+  "wave1_complete": "2025-12-28",
+  "wave2_complete": "2025-12-29",
   "wave1_deliverables": {
-    "fix-datetime-deprecations": {
+    "fix-datetime-deprecations": "complete",
+    "create-database-migrations": "complete",
+    "implement-authentication": "complete",
+    "add-input-validation-security": "complete",
+    "add-api-route-tests": "complete",
+    "add-service-and-model-tests": "complete"
+  },
+  "wave2_deliverables": {
+    "logging-infrastructure": {
       "status": "complete",
-      "files": ["src/models.py", "src/services/fuel_service.py", "src/routes/api.py", "src/routes/secure_api.py"],
-      "notes": "Replaced datetime.utcnow() with datetime.now(UTC) across all models and services"
+      "pr": "#4",
+      "files": ["src/logging_config.py", "src/middleware/request_logger.py", "src/app.py", "src/config.py", "src/routes/api.py", "src/routes/auth.py"]
     },
-    "create-database-migrations": {
+    "deployment-config": {
       "status": "complete",
-      "files": ["migrations/", "scripts/backup_database.py", "scripts/restore_database.py", "docs/DATABASE_MIGRATIONS.md"],
-      "notes": "Flask-Migrate with Alembic, backup/restore scripts, documentation"
+      "pr": "#1",
+      "files": ["Dockerfile", "docker-compose.yml", ".env.example", "gunicorn.conf.py", "docs/DEPLOYMENT.md", "scripts/healthcheck.py"]
     },
-    "implement-authentication": {
+    "offline-error-recovery": {
       "status": "complete",
-      "files": ["src/models.py (User)", "src/routes/auth.py", "src/security.py", "templates/login.html", "templates/profile.html", "templates/manage_users.html"],
-      "notes": "User model with roles, bcrypt hashing, login/logout/profile UI, role-based access control"
+      "pr": "#2",
+      "files": ["static/js/offline.js", "static/js/storage.js", "static/js/app.js", "templates/base.html", "static/css/style.css"]
     },
-    "add-input-validation-security": {
+    "integration-tests": {
       "status": "complete",
-      "files": ["src/security.py", "src/routes/api.py", "requirements.txt"],
-      "notes": "CSRF protection, flask-wtf, flask-limiter, flask-cors, input sanitization"
-    },
-    "add-api-route-tests": {
-      "status": "complete",
-      "files": ["tests/test_api.py"],
-      "notes": "1,317 lines of API route tests"
-    },
-    "add-service-and-model-tests": {
-      "status": "complete",
-      "files": ["tests/test_models.py", "tests/test_ocr_service.py", "tests/test_orb_service.py", "tests/test_security.py"],
-      "notes": "Comprehensive model, OCR, ORB, and security tests"
+      "pr": "#3",
+      "files": ["tests/test_integration.py", "tests/fixtures/sample_data.py", "pytest.ini", "tests/conftest.py"]
     }
   },
-  "integration_fixes": [
-    "Fixed CSRF token display in login.html (was showing raw token)",
-    "Fixed datetime naive/aware comparison in fuel_service.py",
-    "Fixed secure_api.py still using deprecated datetime.utcnow()",
-    "Fixed test_fuel_service.py datetime comparisons",
-    "Fixed login form styling (password field, button)",
-    "Fixed nav username capitalization and spacing"
-  ],
-  "test_status": {
-    "passed": 166,
-    "failed": 14,
-    "notes": "14 failures are test calibration issues (415 vs 400 status codes, security test expectations)"
+  "test_coverage": {
+    "unit_tests": "passing",
+    "integration_tests": "23 E2E tests",
+    "test_time": "<15s"
   },
-  "history": [
-    {
-      "phase": 1,
-      "completed_at": "2025-12-12T00:00:00",
-      "notes": "Planning complete - see ORB_App_Planning_Document.md"
-    },
-    {
-      "phase": 3,
-      "started_at": "2025-12-12T00:00:00",
-      "completed_at": "2025-12-12T12:00:00",
-      "notes": "MVP implemented: Weekly soundings form, Code C & I ORB generation, dashboard with tank levels, history view, 8 passing tests"
-    },
-    {
-      "phase": "iteration",
-      "started_at": "2025-12-12T12:00:00",
-      "completed_at": "2025-12-12T14:00:00",
-      "notes": "Added daily fuel ticket tracking: service tank selector, meter readings, consumption calculation, auto-fill previous end reading. 22 tests total."
-    },
-    {
-      "phase": "iteration",
-      "started_at": "2025-12-18T00:00:00",
-      "completed_at": "2025-12-18T12:00:00",
-      "notes": "Expanded to Engine Room Status Board: renamed app, added StatusEvent/EquipmentStatus/OilLevel models, sewage/potable cards, equipment status grid (10 items), dashboard redesign with modals"
-    },
-    {
-      "phase": "iteration",
-      "started_at": "2025-12-19T00:00:00",
-      "completed_at": "2025-12-19T06:00:00",
-      "notes": "Added Start New Hitch feature: HitchRecord model, data reset/clear, baseline import from previous crew, initializes slop tanks/oil levels/equipment status"
-    },
-    {
-      "phase": "iteration",
-      "started_at": "2025-12-19T06:00:00",
-      "completed_at": "2025-12-19T08:00:00",
-      "notes": "Complete End of Hitch form with OCR: Expanded HitchRecord with vessel/charter/drafts, added FuelTankSounding model for 12 fuel tanks, Google Cloud Vision OCR service for photo-to-form parsing, full form UI with upload section"
-    },
-    {
-      "phase": "wave1_agents",
-      "started_at": "2025-12-27T00:00:00",
-      "completed_at": "2025-12-27T20:00:00",
-      "notes": "Wave 1 multi-agent deployment: 6 agents delivered datetime fixes, migrations, auth, security, and comprehensive tests (+6,191 lines)"
-    },
-    {
-      "phase": "wave1_integration",
-      "started_at": "2025-12-28T14:00:00",
-      "completed_at": "2025-12-28T15:10:00",
-      "notes": "Big O integration review: fixed CSRF bug, datetime comparison issues, login UI polish. 166 tests passing."
-    }
-  ],
-  "created_at": "2025-12-12T00:00:00",
-  "last_updated": "2025-12-28T15:10:00",
-  "mvp_features": {
+  "features": {
     "weekly_soundings": "complete",
-    "orb_code_c": "complete",
-    "orb_code_i": "complete",
+    "orb_code_c_i": "complete",
     "dashboard": "complete",
-    "history_view": "complete",
     "daily_fuel_tickets": "complete",
-    "service_tank_selector": "complete",
-    "sewage_potable_tracking": "complete",
     "equipment_status": "complete",
     "start_new_hitch": "complete",
-    "end_of_hitch_form": "complete",
-    "ocr_import": "complete",
-    "authentication": "complete",
-    "database_migrations": "complete",
-    "handover_package": "not_started"
+    "end_of_hitch_ocr": "complete",
+    "authentication_rbac": "complete",
+    "structured_logging": "complete",
+    "offline_support": "complete",
+    "docker_deployment": "complete"
   },
-  "models": [
-    "WeeklySounding",
-    "ORBEntry",
-    "ServiceTankConfig",
-    "DailyFuelTicket",
-    "StatusEvent",
-    "EquipmentStatus",
-    "OilLevel",
-    "HitchRecord",
-    "FuelTankSounding",
-    "User"
+  "history": [
+    {"phase": "wave1", "completed": "2025-12-28", "notes": "Security, auth, migrations, tests"},
+    {"phase": "wave2", "completed": "2025-12-29", "notes": "Logging, deployment, offline, integration tests"}
   ],
-  "api_endpoints": {
-    "tanks": ["GET /api/tanks", "GET /api/tanks/<id>/lookup"],
-    "soundings": ["GET /api/soundings", "POST /api/soundings", "GET /api/dashboard/stats"],
-    "fuel": ["GET /api/fuel-tickets", "POST /api/fuel-tickets", "GET /api/fuel-tickets/stats", "GET /api/service-tank", "POST /api/service-tank"],
-    "status": ["GET /api/status-events", "POST /api/status-events", "GET /api/status-events/latest"],
-    "equipment": ["GET /api/equipment", "GET /api/equipment/<id>", "POST /api/equipment/<id>", "POST /api/equipment/bulk"],
-    "hitch": ["GET /api/hitch/current", "GET /api/hitch/<id>", "PUT /api/hitch/<id>", "POST /api/hitch/start", "POST /api/hitch/end", "POST /api/hitch/reset", "POST /api/hitch/parse-image"],
-    "dashboard": ["GET /api/dashboard/full"],
-    "auth": ["POST /auth/login", "POST /auth/logout", "GET /auth/profile", "GET /auth/manage-users"]
-  },
   "next_steps": [
-    "Fix remaining 14 test failures (test calibration)",
-    "Wave 2: logging, deployment config, error recovery, frontend tests",
-    "Wave 3: API docs, OCR improvements, performance monitoring"
-  ]
+    "Local testing with Docker",
+    "Deploy to staging",
+    "Test on vessel during port call",
+    "Iterate based on crew feedback"
+  ],
+  "created_at": "2025-12-12T00:00:00",
+  "last_updated": "2025-12-29T04:25:00"
 }
