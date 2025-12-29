@@ -14,8 +14,15 @@ from services.sounding_service import SoundingService
 from services.orb_service import ORBService
 from services.fuel_service import FuelService
 from services.ocr_service import parse_end_of_hitch_image
+from logging_config import get_logger, get_audit_logger
 
 api_bp = Blueprint("api", __name__)
+logger = get_logger("oil_record_book")
+
+
+def _get_audit_logger():
+    """Get audit logger from app context."""
+    return getattr(current_app, "audit_logger", get_audit_logger())
 
 
 def get_sounding_service() -> SoundingService:
@@ -189,6 +196,11 @@ def create_sounding():
         db.session.add_all([entry_c, entry_i])
         db.session.commit()
 
+        # Audit log sounding creation
+        audit = _get_audit_logger()
+        audit.sounding_created(current_user.id, sounding.id, result_17p["m3"], result_17s["m3"])
+        logger.info(f"Weekly sounding #{sounding.id} created by '{current_user.username}'")
+
         return jsonify({
             "sounding": sounding.to_dict(),
             "orb_entries": [entry_c.to_dict(), entry_i.to_dict()],
@@ -196,9 +208,11 @@ def create_sounding():
 
     except ValueError as e:
         db.session.rollback()
+        logger.warning(f"Sounding creation failed: {e}")
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         db.session.rollback()
+        logger.exception("Sounding creation error")
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 
@@ -403,13 +417,20 @@ def create_fuel_ticket():
         db.session.add(ticket)
         db.session.commit()
 
+        # Audit log fuel ticket creation
+        audit = _get_audit_logger()
+        audit.fuel_ticket_created(current_user.id, ticket.id, consumption)
+        logger.info(f"Fuel ticket #{ticket.id} created: {consumption} gallons by '{current_user.username}'")
+
         return jsonify(ticket.to_dict()), 201
 
     except ValueError as e:
         db.session.rollback()
+        logger.warning(f"Fuel ticket creation failed: {e}")
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         db.session.rollback()
+        logger.exception("Fuel ticket creation error")
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 
@@ -589,6 +610,12 @@ def update_equipment_status(equipment_id: str):
         return jsonify({"error": "Note required for issue/offline status"}), 400
 
     try:
+        # Get previous status for audit logging
+        prev_status = EquipmentStatus.query.filter_by(
+            equipment_id=equipment_id
+        ).order_by(EquipmentStatus.updated_at.desc()).first()
+        old_status = prev_status.status if prev_status else None
+
         status = EquipmentStatus(
             equipment_id=equipment_id,
             status=data["status"],
@@ -599,10 +626,16 @@ def update_equipment_status(equipment_id: str):
         db.session.add(status)
         db.session.commit()
 
+        # Audit log equipment status change
+        audit = _get_audit_logger()
+        audit.equipment_status_changed(current_user.id, equipment_id, old_status, data["status"])
+        logger.info(f"Equipment '{equipment_id}' status changed: {old_status} -> {data['status']}")
+
         return jsonify(status.to_dict()), 201
 
     except Exception as e:
         db.session.rollback()
+        logger.exception(f"Equipment status update error for '{equipment_id}'")
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 
@@ -1007,14 +1040,21 @@ def start_new_hitch():
 
         db.session.commit()
 
+        # Audit log hitch start
+        data_cleared = data.get("clear_data", True)
+        audit = _get_audit_logger()
+        audit.hitch_started(current_user.id, hitch.id, data_cleared)
+        logger.info(f"New hitch #{hitch.id} started by '{current_user.username}', data_cleared={data_cleared}")
+
         return jsonify({
             "message": "New hitch started successfully",
             "hitch": hitch.to_dict(),
-            "data_cleared": data.get("clear_data", True),
+            "data_cleared": data_cleared,
         }), 201
 
     except Exception as e:
         db.session.rollback()
+        logger.exception("Hitch start error")
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 
@@ -1100,6 +1140,11 @@ def create_end_of_hitch():
 
         db.session.commit()
 
+        # Audit log hitch end
+        audit = _get_audit_logger()
+        audit.hitch_ended(current_user.id, hitch.id)
+        logger.info(f"End of hitch #{hitch.id} record created by '{current_user.username}'")
+
         return jsonify({
             "message": "End of hitch record created",
             "hitch": hitch.to_dict(),
@@ -1107,6 +1152,7 @@ def create_end_of_hitch():
 
     except Exception as e:
         db.session.rollback()
+        logger.exception("Hitch end error")
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 
@@ -1126,6 +1172,12 @@ def reset_all_data():
         }), 400
 
     try:
+        # Track tables being cleared for audit
+        tables_cleared = [
+            "FuelTankSounding", "DailyFuelTicket", "WeeklySounding", "ORBEntry",
+            "StatusEvent", "EquipmentStatus", "OilLevel", "ServiceTankConfig", "HitchRecord"
+        ]
+
         # Clear all operational tables
         FuelTankSounding.query.delete()
         DailyFuelTicket.query.delete()
@@ -1139,9 +1191,15 @@ def reset_all_data():
 
         db.session.commit()
 
+        # Audit log data reset (CRITICAL operation)
+        audit = _get_audit_logger()
+        audit.data_reset(current_user.id, tables_cleared)
+        logger.warning(f"DATA RESET performed by '{current_user.username}' - all operational data cleared")
+
         return jsonify({"message": "All data cleared successfully"}), 200
 
     except Exception as e:
         db.session.rollback()
+        logger.exception("Data reset error")
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 

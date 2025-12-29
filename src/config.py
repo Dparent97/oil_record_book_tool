@@ -35,17 +35,28 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
 
+    # Logging configuration
+    LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
+    LOG_DIR = BASE_DIR / "logs"
+    LOG_JSON_FORMAT = os.environ.get("LOG_JSON_FORMAT", "True").lower() == "true"
+    LOG_MAX_BYTES = int(os.environ.get("LOG_MAX_BYTES", 10 * 1024 * 1024))  # 10MB
+    LOG_BACKUP_COUNT = int(os.environ.get("LOG_BACKUP_COUNT", 5))
+
 
 class DevelopmentConfig(Config):
     """Development configuration."""
 
     DEBUG = True
+    LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
+    LOG_JSON_FORMAT = os.environ.get("LOG_JSON_FORMAT", "False").lower() == "true"
 
 
 class ProductionConfig(Config):
     """Production configuration."""
 
     DEBUG = False
+    LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
+    LOG_JSON_FORMAT = True
 
 
 class TestingConfig(Config):
@@ -53,6 +64,8 @@ class TestingConfig(Config):
 
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    LOG_LEVEL = "WARNING"
+    LOG_JSON_FORMAT = False
 
 
 config = {
