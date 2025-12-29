@@ -28,6 +28,11 @@
                     <a href="/new-hitch" class="nav-link {% if request.path == '/new-hitch' %}active{% endif %}">New Hitch</a>
                 {% endif %}
                 <div class="nav-user">
+                    <!-- Offline Status Indicator -->
+                    <div id="offline-indicator" class="offline-indicator online" title="Connected">
+                        <span class="indicator-dot"></span>
+                        <span id="queue-badge" class="queue-badge"></span>
+                    </div>
                     <span class="nav-username">{{ current_user.username | capitalize }}</span>
                     <a href="/auth/profile" class="nav-link nav-user-link">Profile</a>
                     <a href="/auth/logout" class="nav-link nav-user-link">Logout</a>
@@ -42,8 +47,13 @@
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Load offline support scripts first -->
+    <script src="{{ url_for('static', filename='js/storage.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/offline.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
-
