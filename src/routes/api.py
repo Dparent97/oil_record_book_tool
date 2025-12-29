@@ -57,6 +57,19 @@ def require_role(route_type: str):
     return decorator
 
 
+# --- Health Check (for offline connectivity verification) ---
+
+
+@api_bp.route("/health", methods=["GET", "HEAD"])
+def health_check():
+    """Health check endpoint for connectivity verification.
+    
+    Used by offline.js to verify actual connectivity (navigator.onLine can be unreliable).
+    Returns minimal response for efficiency on slow connections.
+    """
+    return jsonify({"status": "ok"}), 200
+
+
 # --- Tank Info ---
 
 

@@ -1823,4 +1823,286 @@ body {
   }
 }
 
+/* ==========================================
+   Offline Support & Sync Status Styles
+   ========================================== */
+
+/* Offline Status Indicator */
+.offline-indicator {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-right: var(--space-sm);
+  cursor: pointer;
+}
+
+.offline-indicator .indicator-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+/* Online state - green dot */
+.offline-indicator.online .indicator-dot {
+  background: var(--accent-success);
+  box-shadow: 0 0 6px var(--accent-success);
+}
+
+/* Offline state - red dot with pulse */
+.offline-indicator.offline .indicator-dot {
+  background: var(--accent-danger);
+  box-shadow: 0 0 6px var(--accent-danger);
+  animation: pulse 2s infinite;
+}
+
+/* Syncing state - animated indicator */
+.offline-indicator.syncing .indicator-dot {
+  background: var(--accent-primary);
+  box-shadow: 0 0 6px var(--accent-primary);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
+
+/* Queue Badge (pending items count) */
+.queue-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  color: white;
+  background: var(--accent-danger);
+  border-radius: 8px;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.3s ease;
+}
+
+.queue-badge.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ==========================================
+   Toast Notifications
+   ========================================== */
+
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  z-index: 1000;
+  pointer-events: none;
+  width: calc(100% - 32px);
+  max-width: 400px;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  pointer-events: auto;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* Toast type variants */
+.toast-success {
+  border-color: var(--accent-success);
+}
+
+.toast-success .toast-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent-success);
+}
+
+.toast-error {
+  border-color: var(--accent-danger);
+}
+
+.toast-error .toast-icon {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--accent-danger);
+}
+
+.toast-warning {
+  border-color: var(--accent-primary);
+}
+
+.toast-warning .toast-icon {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--accent-primary);
+}
+
+.toast-info {
+  border-color: var(--accent-info);
+}
+
+.toast-info .toast-icon {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-info);
+}
+
+.toast-sync {
+  border-color: var(--accent-primary);
+}
+
+.toast-sync .toast-icon {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--accent-primary);
+  animation: spin 1s linear infinite;
+}
+
+/* ==========================================
+   Offline Banner (optional - for critical pages)
+   ========================================== */
+
+.offline-banner {
+  display: none;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(239, 68, 68, 0.1);
+  border-bottom: 1px solid var(--accent-danger);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--accent-danger);
+}
+
+.offline-banner.visible {
+  display: block;
+}
+
+.offline-banner .banner-icon {
+  margin-right: var(--space-xs);
+}
+
+/* ==========================================
+   Form Auto-Save Indicator
+   ========================================== */
+
+.autosave-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.autosave-indicator.saving {
+  opacity: 1;
+  color: var(--accent-primary);
+}
+
+.autosave-indicator.saved {
+  opacity: 1;
+  color: var(--accent-success);
+}
+
+.autosave-indicator .save-icon {
+  font-size: 0.875rem;
+}
+
+/* ==========================================
+   Sync Status Button (manual sync trigger)
+   ========================================== */
+
+.sync-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sync-button:hover {
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.sync-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sync-button.syncing .sync-icon {
+  animation: spin 1s linear infinite;
+}
+
+.sync-button .sync-icon {
+  font-size: 1rem;
+}
+
+.sync-button .sync-count {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: var(--accent-danger);
+  color: white;
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
 
