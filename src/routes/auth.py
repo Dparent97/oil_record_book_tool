@@ -1,13 +1,19 @@
 """Authentication routes for Oil Record Book Tool."""
 
 from datetime import datetime, UTC
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from flask_login import login_user, logout_user, login_required, current_user
-from werkzeug.security import check_password_hash
 
 from models import db, User, UserRole
+from logging_config import get_logger, get_audit_logger
 
 auth_bp = Blueprint("auth", __name__)
+logger = get_logger("oil_record_book")
+
+
+def _get_audit_logger():
+    """Get audit logger from app context."""
+    return getattr(current_app, "audit_logger", get_audit_logger())
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
@@ -194,6 +200,11 @@ def toggle_user_status(user_id):
     user = User.query.get_or_404(user_id)
     user.is_active = not user.is_active
     db.session.commit()
+
+    # Audit log user status change
+    audit = _get_audit_logger()
+    audit.user_status_changed(current_user.id, user.id, user.is_active)
+    logger.info(f"User '{user.username}' {'activated' if user.is_active else 'deactivated'} by '{current_user.username}'")
 
     return jsonify({
         "success": True,

@@ -16,10 +16,18 @@ from config import config
 from models import db, User
 from flask_migrate import Migrate
 from security import SecurityConfig
+from logging_config import setup_logging, get_logger
+from middleware.request_logger import init_request_logging
+
+# Module-level logger (initialized in create_app)
+logger = None
+audit_logger = None
 
 
 def create_app(config_name: str | None = None) -> Flask:
     """Application factory."""
+    global logger, audit_logger
+
     if config_name is None:
         config_name = os.environ.get("FLASK_ENV", "development")
 
@@ -29,6 +37,23 @@ def create_app(config_name: str | None = None) -> Flask:
         static_folder="../static",
     )
     app.config.from_object(config[config_name])
+
+    # Initialize logging first (before other extensions)
+    logger, audit_logger = setup_logging(
+        app_name="oil_record_book",
+        log_level=app.config.get("LOG_LEVEL"),
+        log_dir=app.config.get("LOG_DIR"),
+        json_format=app.config.get("LOG_JSON_FORMAT", True),
+        max_bytes=app.config.get("LOG_MAX_BYTES", 10 * 1024 * 1024),
+        backup_count=app.config.get("LOG_BACKUP_COUNT", 5),
+    )
+
+    # Store loggers on app for access in routes
+    app.logger_instance = logger
+    app.audit_logger = audit_logger
+
+    # Initialize request logging middleware
+    init_request_logging(app)
 
     # Initialize extensions
     db.init_app(app)
@@ -86,6 +111,9 @@ def create_app(config_name: str | None = None) -> Flask:
     def csrf_error(error):
         """Handle CSRF errors."""
         if error.description and "csrf" in error.description.lower():
+            logger.warning(f"CSRF error: {error.description}", extra={
+                "extra": {"path": request.path, "method": request.method}
+            })
             return jsonify({"error": f"CSRF token error: {error.description}"}), 400
         return jsonify({"error": "Bad request"}), 400
 
@@ -93,7 +121,44 @@ def create_app(config_name: str | None = None) -> Flask:
     @app.errorhandler(429)
     def ratelimit_handler(e):
         """Handle rate limit errors."""
+        logger.warning("Rate limit exceeded", extra={
+            "extra": {"path": request.path, "ip": request.remote_addr}
+        })
         return jsonify({"error": "Rate limit exceeded. Please try again later."}), 429
+
+    # Generic error handlers with logging
+    @app.errorhandler(404)
+    def not_found_error(error):
+        """Handle 404 errors."""
+        return jsonify({"error": "Resource not found"}), 404
+
+    @app.errorhandler(500)
+    def internal_error(error):
+        """Handle 500 errors with logging."""
+        logger.exception("Internal server error", extra={
+            "extra": {"path": request.path, "method": request.method}
+        })
+        db.session.rollback()
+        return jsonify({"error": "Internal server error"}), 500
+
+    # Health check endpoint (no auth required)
+    @app.route("/health")
+    def health_check():
+        """Health check endpoint for monitoring."""
+        try:
+            # Simple DB check
+            db.session.execute(db.text("SELECT 1"))
+            return jsonify({
+                "status": "healthy",
+                "database": "connected",
+            }), 200
+        except Exception as e:
+            logger.error(f"Health check failed: {e}")
+            return jsonify({
+                "status": "unhealthy",
+                "database": "disconnected",
+                "error": str(e),
+            }), 503
 
     # Note: db.create_all() removed - use migrations instead
 
